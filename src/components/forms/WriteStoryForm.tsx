@@ -29,8 +29,8 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                 return;
             }
 
-            if (file.size > 5 * 1024 * 1024) {
-                alert("Image size must be under 5MB.");
+            if (file.size > 6 * 1024 * 1024) {
+                alert("Image size must be under 6MB.");
                 return;
             }
 

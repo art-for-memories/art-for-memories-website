@@ -109,10 +109,12 @@ function PreservedMemoryForm({ onCallback, currentMemory }: { onCallback: () => 
                         accept="image/*"
                         onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file && file.size > 3 * 1024 * 1024) {
-                                alert('File size must be under 3MB');
+
+                            if (file && file.size > 6 * 1024 * 1024) {
+                                alert('File size must be under 6MB');
                                 return;
                             }
+
                             handleFileChange(e, setOldPhoto, setOldPhotoPreview);
                         }}
                     />
@@ -136,10 +138,12 @@ function PreservedMemoryForm({ onCallback, currentMemory }: { onCallback: () => 
                         accept="image/*"
                         onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file && file.size > 3 * 1024 * 1024) {
-                                alert('File size must be under 3MB');
+
+                            if (file && file.size > 6 * 1024 * 1024) {
+                                alert('File size must be under 6MB');
                                 return;
                             }
+
                             handleFileChange(e, setPreservedPhoto, setPreservedPhotoPreview);
                         }}
                     />
