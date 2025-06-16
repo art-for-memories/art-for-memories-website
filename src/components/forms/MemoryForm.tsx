@@ -84,12 +84,14 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
         if (!files) return;
 
         const newFiles: File[] = [];
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            if (file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) { // Limit file size to 5MB
+
+            if (file.type.startsWith('image/') && file.size <= 6 * 1024 * 1024) {
                 newFiles.push(file);
             } else {
-                setErrorMessage("Only image files under 5MB are allowed.");
+                setErrorMessage("Only image files under 6MB are allowed.");
             }
         }
 

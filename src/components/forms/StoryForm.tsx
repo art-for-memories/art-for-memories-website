@@ -33,8 +33,20 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
 
         const file = files[0];
 
-        if (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // Allow file up to 15MB
+        const maxSize = 15 * 1024 * 1024; // 15MB in bytes
+        if (file.size > maxSize) {
+            setErrorMessage('File size must be 15MB or less.');
+            setSelectedFile(null);
+            return;
+        }
+
+        if (
+            file.type === 'application/pdf' ||
+            file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ) {
             setSelectedFile(file);
+            setErrorMessage(null);
         } else {
             setErrorMessage('Only PDF or DOCX files are allowed.');
             setSelectedFile(null);
@@ -49,12 +61,22 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
 
         const file = files[0];
 
-        if (file.type.startsWith('image/')) {
-            setSelectedImage(file);
-        } else {
+        if (!file.type.startsWith('image/')) {
             setErrorMessage('Only image files are allowed.');
             setSelectedImage(null);
+            return;
         }
+
+        // Allow image up to 6MB
+        const maxSize = 6 * 1024 * 1024; // 6MB in bytes
+        if (file.size > maxSize) {
+            setErrorMessage('Image size must be 6MB or less.');
+            setSelectedImage(null);
+            return;
+        }
+
+        setSelectedImage(file);
+        setErrorMessage(null);
     };
 
     const handleSubmit = async (event: React.FormEvent) => {

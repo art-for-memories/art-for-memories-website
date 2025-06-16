@@ -18,6 +18,7 @@ function GalleryForm({ onSuccess, currentImage }: { onSuccess: () => void, curre
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
+
         const uploadedImage = formData.image ? await uploadFile(formData.image) : null;
 
         try {
@@ -98,8 +99,8 @@ function GalleryForm({ onSuccess, currentImage }: { onSuccess: () => void, curre
                                 return;
                             }
 
-                            if (file.size > 3 * 1024 * 1024) {
-                                alert("Image size must be under 3MB.");
+                            if (file.size > 6 * 1024 * 1024) {
+                                alert("Image size must be under 6MB.");
                                 return;
                             }
 
