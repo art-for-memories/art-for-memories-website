@@ -227,10 +227,30 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
                         onChange={(e) => setStoryType(e.target.value)}
                     >
                         <option value="">Select Type</option>
-                        <option value="Written Story">Written Story</option>
-                        <option value="Illustrated">Illustrated</option>
+                        <option value="Written Story">Write Story</option>
+                        <option value="Illustrated">Upload Story File</option>
                     </select>
                 </div>
+
+                {storyType === 'Illustrated' && (
+                    <div>
+                        <label className="text-sm text-black font-bold">Story Document (PDF or DOCX)</label>
+                        <div
+                            className="border border-gray-300 rounded-md p-2 flex items-center space-x-2 cursor-pointer"
+                            onClick={() => document.getElementById('upload-files')?.click()}
+                        >
+                            <span className="text-gray-400">📎</span>
+                            <span className="text-gray-400">Attach PDF or DOCX</span>
+                            <input
+                                type="file"
+                                className="hidden"
+                                id="upload-files"
+                                onChange={handleFileChange}
+                                accept=".pdf,.docx"
+                            />
+                        </div>
+                    </div>
+                )}
 
                 {/* Title */}
                 <div>
@@ -302,58 +322,44 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
                     </div>
                 )}
 
-                {/* File Upload for Illustrated Stories */}
-                {storyType === "Illustrated" && (
-                    <div>
-                        <label className="text-sm text-black font-bold">Story Document (PDF or DOCX)</label>
-                        <div
-                            className="border border-gray-300 rounded-md p-2 flex items-center space-x-2 cursor-pointer"
-                            onClick={() => document.getElementById('upload-files')?.click()}
-                        >
-                            <span className="text-gray-400">📎</span>
-                            <span className="text-gray-400">Attach PDF or DOCX</span>
-                            <input
-                                type="file"
-                                className="hidden"
-                                id="upload-files"
-                                onChange={handleFileChange}
-                                accept=".pdf,.docx"
-                            />
+                {/* Conditional Fields */}
+                {storyType === 'Written Story' && (
+                    <div className="text-slate-900">
+                        {/* Language Selector */}
+                        <div>
+                            <label className="text-sm text-black font-bold">Language</label>
+                            <select
+                                className="w-full border border-gray-300 rounded-md p-2 text-black focus:outline-none focus:ring-2 focus:ring-black"
+                                value={language}
+                                onChange={(e) => setLanguage(e.target.value)}
+                            >
+                                <option value="English">English</option>
+                                <option value="Kinyarwanda">Kinyarwanda</option>
+                                <option value="French">French</option>
+                            </select>
                         </div>
-                    </div>
-                )}
 
-                {/* Language Selector */}
-                <div>
-                    <label className="text-sm text-black font-bold">Language</label>
-                    <select
-                        className="w-full border border-gray-300 rounded-md p-2 text-black focus:outline-none focus:ring-2 focus:ring-black"
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                    >
-                        <option value="English">English</option>
-                        <option value="Kinyarwanda">Kinyarwanda</option>
-                        <option value="French">French</option>
-                    </select>
-                </div>
-
-                {/* Show only the textarea for the selected language */}
-                {language === 'English' && (
-                    <div className="text-slate-900">
-                        <label className="block font-semibold mb-1">English Content</label>
-                        <Tiptap value={englishContent} onContentChange={setEnglishContent} />
-                    </div>
-                )}
-                {language === 'Kinyarwanda' && (
-                    <div className="text-slate-900">
-                        <label className="block font-semibold mb-1">Kinyarwanda Content</label>
-                        <Tiptap value={kinyarwandaContent} onContentChange={setKinyarwandaContent} />
-                    </div>
-                )}
-                {language === 'French' && (
-                    <div className="text-slate-900">
-                        <label className="block font-semibold mb-1">French Content</label>
-                        <Tiptap value={frenchContent} onContentChange={setFrenchContent} />
+                        <div className="mt-4">
+                            {/* Show only the textarea for the selected language */}
+                            {language === 'English' && (
+                                <div>
+                                    <label className="block font-semibold mb-1">English Content</label>
+                                    <Tiptap value={englishContent} onContentChange={setEnglishContent} />
+                                </div>
+                            )}
+                            {language === 'Kinyarwanda' && (
+                                <div>
+                                    <label className="block font-semibold mb-1">Kinyarwanda Content</label>
+                                    <Tiptap value={kinyarwandaContent} onContentChange={setKinyarwandaContent} />
+                                </div>
+                            )}
+                            {language === 'French' && (
+                                <div>
+                                    <label className="block font-semibold mb-1">French Content</label>
+                                    <Tiptap value={frenchContent} onContentChange={setFrenchContent} />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
