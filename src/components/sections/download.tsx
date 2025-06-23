@@ -26,7 +26,7 @@ function Download() {
 
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start lg:mt-12 w-full mt-8 gap-4">
                             <a
-                                href="https://testflight.apple.com/join/KNqz1VM8"
+                                href="https://apps.apple.com/us/app/art-for-memories/id6746222458"
                                 title="Open Testing"
                                 className="min-w-0"
                                 role="button"
