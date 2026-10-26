@@ -82,8 +82,19 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        if (!firstName || !lastName || !email || !phone || !selectedFile) {
-            setErrorMessage('All fields are required, and at least one file must be uploaded.');
+        if (!firstName || !lastName || !email || !phone || !storyType || !title) {
+            setErrorMessage('Please fill in your name, email, phone, story type and title.');
+            return;
+        }
+
+        if (storyType === 'Illustrated' && !selectedFile) {
+            setErrorMessage('Please upload your story document (PDF or DOCX).');
+            return;
+        }
+
+        const hasText = (html: string) => html.replace(/<[^>]*>/g, '').trim().length > 0;
+        if (storyType === 'Written Story' && ![englishContent, kinyarwandaContent, frenchContent].some(hasText)) {
+            setErrorMessage('Please write your story in at least one language.');
             return;
         }
 
@@ -130,14 +141,20 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
                 setLastName('');
                 setEmail('');
                 setPhone('');
+                setTitle('');
+                setAuthor('');
+                setDate('');
                 setSelectedFile(null);
                 setSelectedImage(null);
+                setKinyarwandaContent('');
+                setEnglishContent('');
+                setFrenchContent('');
                 setSuccessMessage('Story submitted successfully!');
                 setErrorMessage(null);
                 onSuccess();
             } else {
                 const errorData = await response.json();
-                setErrorMessage(errorData.message || 'Failed to submit story. Please try again later.');
+                setErrorMessage(errorData.error || 'Failed to submit story. Please try again later.');
                 setSuccessMessage(null);
             }
         } catch {
@@ -153,7 +170,7 @@ function StoryForm({ onSuccess }: { onSuccess: () => void }) {
             <div className="flex items-center space-x-2 justify-between mb-4">
                 <div className="text-2xl font-bold flex items-center">
                     <span className="bg-white text-white px-1 py-1 rounded">
-                        <div><Image src={'/images/ART.PNG'} alt={"logo"} width={100} height={40} /></div>
+                        <div><Image src={'/images/ART.png'} alt={"logo"} width={100} height={40} /></div>
                     </span>
                 </div>
             </div>

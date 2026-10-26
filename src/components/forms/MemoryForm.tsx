@@ -8,13 +8,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Memory, MemoryImage } from '@/types/memories';
 
-const formSchema = z.object({
+// When an admin edits an existing memory, its images are already stored, so new ones are optional
+const buildFormSchema = (isEditing: boolean) => z.object({
     firstName: z.string().nonempty("First name is required"),
     lastName: z.string().nonempty("Last name is required"),
     victimFullName: z.string().nonempty("Victim full name is required"),
+    memory: z.string().max(5000, "Please keep your memory under 5000 characters").optional(),
     email: z.string().email("Invalid email address"),
     phone: z.string().min(10, "Phone number must be at least 10 digits"),
-    images: z.any().refine((files) => files instanceof FileList && files.length > 0, {
+    images: z.any().refine((files) => isEditing || (Array.isArray(files) && files.length > 0), {
         message: "Please upload at least one image",
     }),
     consent: z.boolean().refine((value) => value === true, {
@@ -22,7 +24,7 @@ const formSchema = z.object({
     }),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof buildFormSchema>>;
 
 export default function MemoryForm({ currentMemory }: { currentMemory?: Memory | undefined }) {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
     const [currentImages, setCurrentImages] = useState<MemoryImage[] | null>([]);
 
     const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<FormData>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(buildFormSchema(Boolean(currentMemory))),
     });
 
     const onSubmit = async (data: FormData) => {
@@ -43,7 +45,7 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
             formData.append("victim_full_name", data.victimFullName);
             formData.append("email", data.email);
             formData.append("phone", data.phone);
-            formData.append("memories", "Memories");
+            formData.append("memories", data.memory?.trim() || "");
 
             for (const file of selectedImages) {
                 formData.append("images", file);
@@ -67,7 +69,7 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
                 setErrorMessage(null);
             } else {
                 const errorData = await response.json();
-                setErrorMessage(errorData.message || "Failed to submit memory. Please try again later.");
+                setErrorMessage(errorData.error || "Failed to submit memory. Please try again later.");
                 setSuccessMessage(null);
             }
         } catch (error) {
@@ -84,6 +86,7 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
         if (!files) return;
 
         const newFiles: File[] = [];
+        let rejected = false;
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
@@ -91,21 +94,27 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
             if (file.type.startsWith('image/') && file.size <= 6 * 1024 * 1024) {
                 newFiles.push(file);
             } else {
-                setErrorMessage("Only image files under 6MB are allowed.");
+                rejected = true;
             }
         }
 
+        setErrorMessage(rejected ? "Only image files under 6MB are allowed." : null);
         setSelectedImages(newFiles);
-        setValue("images", files);
+        // Validate only the files that will actually be uploaded
+        setValue("images", newFiles, { shouldValidate: true });
     };
 
     useEffect(() => {
         if (currentMemory) {
-            const { firstName, lastName, email, phone, MemoriesImage } = currentMemory;
+            const { firstName, lastName, email, phone, victimFullName, memory, MemoriesImage } = currentMemory;
             setValue("firstName", firstName);
             setValue("lastName", lastName);
             setValue("email", email);
             setValue("phone", phone);
+            setValue("victimFullName", victimFullName || "");
+            setValue("memory", memory || "");
+            // Consent was given when the memory was originally submitted
+            setValue("consent", true);
             setCurrentImages(MemoriesImage);
         }
     }, [currentMemory, setValue]);
@@ -115,7 +124,7 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
             <div className="flex items-center space-x-2 justify-between mb-4">
                 <div className="text-2xl font-bold flex items-center">
                     <span className="bg-white text-white px-1 py-1 rounded">
-                        <div><Image src={'/images/ART.PNG'} alt={"logo"} width={100} height={40} /></div>
+                        <div><Image src={'/images/ART.png'} alt={"logo"} width={100} height={40} /></div>
                     </span>
                 </div>
             </div>
@@ -253,6 +262,19 @@ export default function MemoryForm({ currentMemory }: { currentMemory?: Memory |
                         aria-label="Victim Full Name"
                     />
                     {errors.victimFullName && <p className="text-red-500 text-sm">{errors.victimFullName.message}</p>}
+                </div>
+
+                {/* Memory */}
+                <div>
+                    <label className="text-sm text-black font-bold">Your Memory <span className="font-normal text-gray-500">(optional)</span></label>
+                    <textarea
+                        rows={4}
+                        placeholder="Share what you remember about them"
+                        className="w-full border border-gray-300 rounded-md p-2 text-black focus:outline-none focus:ring-2 focus:ring-black"
+                        {...register("memory")}
+                        aria-label="Your Memory"
+                    />
+                    {errors.memory && <p className="text-red-500 text-sm">{errors.memory.message}</p>}
                 </div>
 
                 {/* Consent Checkbox */}

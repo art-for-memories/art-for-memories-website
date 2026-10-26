@@ -1,7 +1,7 @@
 import { TableProps } from '@/types/memories';
 import Image from 'next/image';
 
-const Table: React.FC<TableProps> = ({ headers, data, onDelete, onPreview, onApproved }) => {
+const Table: React.FC<TableProps> = ({ headers, data, onDelete, onPreview, onApproved, onRejected }) => {
     return (
         <div className='bg-white rounded-xl flex flex-col items-center justify-center p-4 w-full'>
             <table className="w-full text-left whitespace-nowrap">
@@ -39,7 +39,7 @@ const Table: React.FC<TableProps> = ({ headers, data, onDelete, onPreview, onApp
                             <td className="p-4">{memory.email}</td>
                             <td className="p-4">{memory.phone}</td>
                             <td className="p-4">{memory.victimFullName}</td>
-                            <td className="p-4">{memory.memory}</td>
+                            <td className="p-4 max-w-xs truncate" title={memory.memory}>{memory.memory}</td>
                             <td className="p-4 text-sm">
                                 {memory.status === 'approved' ? (
                                     <span className="text-white bg-green-500 rounded-lg px-4 py-2 text-xsm">Approved</span>
@@ -50,9 +50,15 @@ const Table: React.FC<TableProps> = ({ headers, data, onDelete, onPreview, onApp
                                 )}
                             </td>
                             <td className="p-4">
-                                <button onClick={() => onApproved && onApproved(memory.id)} className="text-gray-500 hover:text-green-500 bg-green-200 rounded-xl p-2">
+                                <button onClick={() => onApproved && onApproved(memory.id)} title="Approve" className="text-gray-500 hover:text-green-500 bg-green-200 rounded-xl p-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path opacity=".34" d="m8.38 11.998 2.41 2.42 4.83-4.84" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path><path d="M10.75 2.45c.69-.59 1.82-.59 2.52 0l1.58 1.36c.3.26.86.47 1.26.47h1.7c1.06 0 1.93.87 1.93 1.93v1.7c0 .39.21.96.47 1.26l1.36 1.58c.59.69.59 1.82 0 2.52l-1.36 1.58c-.26.3-.47.86-.47 1.26v1.7c0 1.06-.87 1.93-1.93 1.93h-1.7c-.39 0-.96.21-1.26.47l-1.58 1.36c-.69.59-1.82.59-2.52 0l-1.58-1.36c-.3-.26-.86-.47-1.26-.47H6.18c-1.06 0-1.93-.87-1.93-1.93V16.1c0-.39-.21-.95-.46-1.25l-1.35-1.59c-.58-.69-.58-1.81 0-2.5l1.35-1.59c.25-.3.46-.86.46-1.25V6.2c0-1.06.87-1.93 1.93-1.93h1.73c.39 0 .96-.21 1.26-.47l1.58-1.35Z" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path></svg>
                                 </button>
+
+                                {memory.status !== 'rejected' && (
+                                    <button onClick={() => onRejected && onRejected(memory.id)} title="Reject" className="text-gray-700 ml-2 hover:text-red-700 bg-yellow-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                                        Reject
+                                    </button>
+                                )}
 
                                 <button onClick={() => onPreview && onPreview(memory)} className="text-gray-500 ml-2 hover:text-red-500 bg-gray-200 rounded-xl p-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">

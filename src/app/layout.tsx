@@ -5,8 +5,8 @@ import { Suspense } from "react";
 import Loading from "@/components/loading";
 
 export const metadata: Metadata = {
-  title: "Art of Memories",
-  description: "Art of Memories is a platform that allows you to share your memories in a creative way.",
+  title: "Art for Memories",
+  description: "Art for Memories is a platform that allows you to share your memories in a creative way.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {

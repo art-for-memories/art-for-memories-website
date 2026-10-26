@@ -15,7 +15,20 @@ function Stories() {
     const [loading, setLoading] = useState(false);
     const [currentStory, setCurrentStory] = useState<Story | null>(null);
 
+    const [searchTerm, setSearchTerm] = useState('');
+
     const headers = ['title', 'author', 'date', 'type'];
+
+    const visibleStories = stories.filter((story) => {
+        const term = searchTerm.trim().toLowerCase();
+        return !term || [story.title, story.author].some((value) => (value || '').toLowerCase().includes(term));
+    });
+
+    // Opening the form from the header button always starts a new story
+    const openNewStoryForm = () => {
+        setCurrentStory(null);
+        setWriteForm(true);
+    };
 
     const getAllStories = async () => {
         try {
@@ -30,9 +43,10 @@ function Stories() {
                 console.error('Failed to fetch stories');
             }
 
-            setLoading(false);
         } catch (error) {
             console.error('Error fetching stories:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -43,14 +57,7 @@ function Stories() {
         try {
             setLoading(true);
 
-            const response = await fetch(`/api/stories/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ slug: id }),
-            });
+            const response = await fetch(`/api/stories/${id}`, { method: 'DELETE' });
 
             if (response.ok) {
                 setStories(stories.filter((story) => story.id !== id));
@@ -68,14 +75,7 @@ function Stories() {
 
     const handlePreview = async (id: string) => {
         try {
-            const response = await fetch(`/api/stories/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ slug: id }),
-            });
+            const response = await fetch(`/api/stories/${id}`);
 
             if (response.ok) {
                 const story = await response.json();
@@ -108,7 +108,7 @@ function Stories() {
                             <h1 className="text-xl font-semibold text-black">Their Stories</h1>
 
                             <div className='flex items-center'>
-                                <button onClick={() => setWriteForm(true)} className="bg-black ml-2 text-white px-4 py-2 flex items-center rounded cursor-pointer">
+                                <button onClick={openNewStoryForm} className="bg-black ml-2 text-white px-4 py-2 flex items-center rounded cursor-pointer">
                                     <span>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -120,7 +120,7 @@ function Stories() {
                         </div>
 
                         <FormModal isOpen={isWriteFormOpen} onClose={() => setWriteForm(false)}>
-                            <WriteStoryForm currentStory={currentStory} />
+                            <WriteStoryForm key={currentStory?.id ?? 'new'} currentStory={currentStory} />
                         </FormModal>
                     </header>
 
@@ -130,7 +130,7 @@ function Stories() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                             </svg>
                         </span>
-                        <input type="text" placeholder="Enter Story name..." className="p-2 focus:outline-none text-slate-700" />
+                        <input type="text" placeholder="Search by title or author..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 focus:outline-none text-slate-700 w-full" />
                     </div>
 
                     {/* Table */}
@@ -138,7 +138,7 @@ function Stories() {
                         {loading && <div className="my-10"><FetchSpinner /></div>}
                         <StoriesTable
                             headers={headers}
-                            data={stories}
+                            data={visibleStories}
                             onDelete={handleDelete}
                             onPreview={handlePreview}
                         />

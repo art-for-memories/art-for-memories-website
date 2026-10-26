@@ -1,89 +1,54 @@
 "use client";
 
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import { useEffect } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Bold from "@tiptap/extension-bold";
-import Italic from "@tiptap/extension-italic";
-import Strike from "@tiptap/extension-strike";
+import Underline from "@tiptap/extension-underline";
 import { FaBold, FaItalic, FaUnderline, FaStrikethrough } from "react-icons/fa";
 
-// Custom Underline Extension
-const Underline = Extension.create({
-  name: "underline",
-  addCommands() {
-    return {
-      toggleUnderline:
-        () =>
-        ({ chain }) => {
-          return chain().focus().toggleMark("underline").run();
-        },
-    };
-  },
-  addKeyboardShortcuts() {
-    return {
-      "Mod-u": () => this.editor.commands.toggleUnderline(),
-    };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["textStyle"],
-        attributes: {
-          underline: {
-            default: false,
-            renderHTML: (attributes) => {
-              if (attributes.underline) {
-                return ["u", 0];
-              }
-              return {};
-            },
-            parseHTML: (element) => element.tagName === "U",
-          },
-        },
-      },
-    ];
-  },
-});
-
+// StarterKit already ships bold, italic and strike; underline is the only extra mark
 const Tiptap = ({ onContentChange, value = "" }) => {
   const editor = useEditor({
-    extensions: [StarterKit, Bold, Italic, Strike, Underline],
+    extensions: [StarterKit, Underline],
     content: value,
+    // Avoids hydration mismatches when rendered from a Next.js page
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onContentChange(editor.getHTML());
     },
   });
 
+  // Keep the editor in sync when the parent resets or loads content (e.g. after submit)
+  useEffect(() => {
+    if (!editor) return;
+    const isSame = value === editor.getHTML() || (value === "" && editor.isEmpty);
+    if (!isSame) {
+      editor.commands.setContent(value, false);
+    }
+  }, [editor, value]);
+
   if (!editor) return null;
+
+  const toolbarButton = (label, isActive, onClick, Icon) => (
+    <button
+      type="button"
+      aria-label={label}
+      aria-pressed={isActive}
+      onClick={onClick}
+      className={`p-2 border rounded ${isActive ? "bg-gray-200" : ""}`}
+    >
+      <Icon />
+    </button>
+  );
 
   return (
     <div className="p-4 bg-white border rounded-lg">
       {/* Toolbar */}
       <div className="flex gap-2 mb-10">
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className="p-2 border rounded"
-        >
-          <FaBold />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className="p-2 border rounded"
-        >
-          <FaItalic />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className="p-2 border rounded"
-        >
-          <FaUnderline />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          className="p-2 border rounded"
-        >
-          <FaStrikethrough />
-        </button>
+        {toolbarButton("Bold", editor.isActive("bold"), () => editor.chain().focus().toggleBold().run(), FaBold)}
+        {toolbarButton("Italic", editor.isActive("italic"), () => editor.chain().focus().toggleItalic().run(), FaItalic)}
+        {toolbarButton("Underline", editor.isActive("underline"), () => editor.chain().focus().toggleUnderline().run(), FaUnderline)}
+        {toolbarButton("Strikethrough", editor.isActive("strike"), () => editor.chain().focus().toggleStrike().run(), FaStrikethrough)}
       </div>
 
       {/* Text Editor */}

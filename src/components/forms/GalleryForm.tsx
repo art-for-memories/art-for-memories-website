@@ -19,10 +19,10 @@ function GalleryForm({ onSuccess, currentImage }: { onSuccess: () => void, curre
         e.preventDefault();
         setLoading(true);
 
-        const uploadedImage = formData.image ? await uploadFile(formData.image) : null;
-
         try {
-            const data: { name: string; image: string; current_image_id?: string } = {
+            const uploadedImage = formData.image ? await uploadFile(formData.image) : null;
+
+            const data: { name: string; image: string | null; current_image_id?: string } = {
                 name: formData.name,
                 image: uploadedImage,
             };
@@ -49,7 +49,7 @@ function GalleryForm({ onSuccess, currentImage }: { onSuccess: () => void, curre
                 onSuccess();
             } else {
                 const errorData = await response.json();
-                alert(errorData.message || 'Failed to submit image. Please try again later.');
+                alert(errorData.error || 'Failed to submit image. Please try again later.');
             }
         } catch (error) {
             console.error('Error submitting image:', error);

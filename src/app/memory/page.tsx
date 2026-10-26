@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Submit Your Memories",
-    description: "Submit your memories to Art of Memories Rwanda and contribute to preserving the legacy of Genocide Survivors through art.",
-    keywords: ["Memory Submission", "Art of Memories Rwanda", "Genocide Survivors", "Preserve Memories", "Submit Memories", "rwanda", "art", "genocide", "survivors"],
+    description: "Submit your memories to Art for Memories Rwanda and contribute to preserving the legacy of Genocide Survivors through art.",
+    keywords: ["Memory Submission", "Art for Memories Rwanda", "Genocide Survivors", "Preserve Memories", "Submit Memories", "rwanda", "art", "genocide", "survivors"],
 };
 
 export default function Page() {

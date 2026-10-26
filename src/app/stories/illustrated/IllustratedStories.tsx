@@ -25,7 +25,7 @@ function IllustratedStories() {
 
     useEffect(() => {
         getAllStories();
-    })
+    }, [])
 
     return (
         <StoriesList title="Illustrated Stories" data={illustratedStories} />

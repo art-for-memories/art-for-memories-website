@@ -5,7 +5,7 @@ export interface Stories {
     author: string;
     type: string;
     date: string;
-    image: File | null;
+    image: string | null;
     kinyarwandaContent: string;
     englishContent: string;
     frenchContent: string;

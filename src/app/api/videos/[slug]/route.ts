@@ -1,40 +1,46 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
+import { requireAdmin } from "@/config/auth";
 
-export async function DELETE(req: Request) {
-    const { slug } = await req.json();
+type Params = { params: Promise<{ slug: string }> };
 
-    try {
-        await prisma.video.delete({
-            where: {
-                id: slug,
-            },
-        });
+export async function GET(_req: NextRequest, { params }: Params) {
+  const { slug } = await params;
 
-        return new Response("Video deleted successfully", { status: 200 });
-    } catch (error) {
-        console.error("Error deleting video:", error);
-        return new Response("Failed to delete video", { status: 500 });
+  try {
+    const video = await prisma.video.findUnique({
+      where: {
+        id: slug,
+      },
+    });
+
+    if (!video) {
+      return NextResponse.json({ error: "Video not found" }, { status: 404 });
     }
+
+    return NextResponse.json(video);
+  } catch (error) {
+    console.error("Error fetching video:", error);
+    return NextResponse.json({ error: "Failed to fetch video" }, { status: 500 });
+  }
 }
 
-export async function POST(req: Request) {
-    const { slug } = await req.json();
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
-    try {
-        const video = await prisma.video.findUnique({
-            where: {
-                id: slug,
-            },
-        });
+  const { slug } = await params;
 
-        if (!video) {
-            return NextResponse.json({ error: "Video not found" }, { status: 404 });
-        }
+  try {
+    await prisma.video.delete({
+      where: {
+        id: slug,
+      },
+    });
 
-        return NextResponse.json(video);
-    } catch (error) {
-        console.error("Error fetching video:", error);
-        return new Response("Failed to fetch video", { status: 500 });
-    }
+    return NextResponse.json({ message: "Video deleted successfully" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting video:", error);
+    return NextResponse.json({ error: "Failed to delete video" }, { status: 500 });
+  }
 }

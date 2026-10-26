@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
+import { requireAdmin } from "@/config/auth";
 
 export async function POST(req: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   try {
     let body;
 
@@ -27,12 +31,17 @@ export async function POST(req: Request) {
         where: { id: current_image_id },
         data: {
           name,
-          image,
+          // Keep the existing image when only the name is edited
+          ...(image && { image }),
         },
       });
 
       return NextResponse.json(updatedImage, { status: 200 });
     } else {
+      if (!image) {
+        return NextResponse.json({ error: "Image is required" }, { status: 400 });
+      }
+
       const gallery = await prisma.gallery.create({
         data: {
           name,

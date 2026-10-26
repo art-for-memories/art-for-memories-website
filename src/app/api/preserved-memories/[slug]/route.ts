@@ -1,31 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
+import { requireAdmin } from "@/config/auth";
 
-export async function DELETE(req: NextRequest) {
-  const { slug } = await req.json();
+type Params = { params: Promise<{ slug: string }> };
 
-  try {
-    const deletedStory = await prisma.art.delete({
-      where: {
-        id: slug,
-      },
-    });
-
-    return NextResponse.json(deletedStory, { status: 200 });
-  } catch (error) {
-    console.error("Error deleting story:", error);
-    return NextResponse.json(
-      { error: "Failed to delete story" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(req: NextRequest) {
-  const { slug } = await req.json();
+export async function GET(_req: NextRequest, { params }: Params) {
+  const { slug } = await params;
 
   try {
-    const story = await prisma.art.findUnique({
+    const art = await prisma.art.findUnique({
       where: {
         id: slug,
       },
@@ -38,15 +21,38 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!story) {
-      return NextResponse.json({ error: "Story not found" }, { status: 404 });
+    if (!art) {
+      return NextResponse.json({ error: "Art not found" }, { status: 404 });
     }
 
-    return NextResponse.json(story);
+    return NextResponse.json(art);
   } catch (error) {
-    console.error("Error creating art:", error);
+    console.error("Error fetching art:", error);
     return NextResponse.json(
-      { error: "Failed to create art" },
+      { error: "Failed to fetch art" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const { slug } = await params;
+
+  try {
+    const deletedArt = await prisma.art.delete({
+      where: {
+        id: slug,
+      },
+    });
+
+    return NextResponse.json(deletedArt, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting art:", error);
+    return NextResponse.json(
+      { error: "Failed to delete art" },
       { status: 500 }
     );
   }

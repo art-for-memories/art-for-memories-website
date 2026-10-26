@@ -71,9 +71,6 @@ export default function MemoryCard({ props }: { props: Art }) {
             {props.preview && (
                 <div className="bg-black rounded-sm text-white p-10 text-xl text-center">
                     <div>{props.name}</div>
-                    {/* <div>AGED: {props.age} years old</div> */}
-                    {/* <div>Killed on {props.killedOn}</div>
-                    <div>submitted by {props.submittedBy}</div> */}
                 </div>
             )}
         </div>

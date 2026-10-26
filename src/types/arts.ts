@@ -4,8 +4,6 @@ export interface Art {
     age: string | number;
     oldPhoto: string;
     preservedPhoto: string;
-    killedOn?: string;
-    submittedBy?: string;
     preview?: boolean;
 }
 

@@ -1,8 +1,9 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { getServerSession, Session, User as NextAuthUser } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "../../lib/prisma";
 
 // Extend the Session and User types to include the role property
 declare module "next-auth" {
@@ -24,15 +25,10 @@ interface CustomUser extends NextAuthUser {
 export const authOptions = {
   // Callback to modify the session object
   callbacks: {
-    session: async ({ session }: { session: Session; user: CustomUser }) => {
-      const dbUser = await prisma.user.findUnique({
-        where: { email: session.user?.email || "" },
-      });
-
-      if (dbUser) {
-        if (session.user) {
-          session.user.role = dbUser.role;
-        }
+    // With the database session strategy the adapter already loads the user row, so no extra query is needed
+    session: async ({ session, user }: { session: Session; user: CustomUser }) => {
+      if (session.user) {
+        session.user.role = user.role ?? null;
       }
 
       return session;
@@ -44,8 +40,9 @@ export const authOptions = {
     },
   },
 
-  // Prisma adapter to connect NextAuth.js with the database
-  adapter: PrismaAdapter(prisma),
+  // Prisma adapter to connect NextAuth.js with the database.
+  // The adapter only uses model delegates, which the Accelerate-extended client keeps intact.
+  adapter: PrismaAdapter(prisma as unknown as PrismaClient),
 
   // Authentication providers
   providers: [
@@ -59,3 +56,26 @@ export const authOptions = {
 
 // Utility function to retrieve the server session with authentication options
 export const getServerAuthSession = () => getServerSession(authOptions);
+
+const ADMIN_ROLES = ["ADMIN", "SUPERADMIN"];
+
+/**
+ * Guard for API route handlers. Returns a 401/403 response when the caller is not an admin,
+ * or null when the request may proceed.
+ */
+export const requireAdmin = async (): Promise<NextResponse | null> => {
+  const session = await getServerAuthSession();
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!ADMIN_ROLES.includes(session.user.role ?? "")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  return null;
+};
+
+/** True when the current request comes from a signed-in admin. */
+export const isAdmin = async (): Promise<boolean> => (await requireAdmin()) === null;

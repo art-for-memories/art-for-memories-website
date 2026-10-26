@@ -42,6 +42,7 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                 setIsSubmitting(false);
                 setFormData((prev) => ({ ...prev, image: url }));
             } catch {
+                setIsSubmitting(false);
                 alert("Failed to upload image. Please try again.");
             }
         }
@@ -71,6 +72,7 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                 setIsSubmitting(false);
                 setFormData((prev) => ({ ...prev, file: url }));
             } catch {
+                setIsSubmitting(false);
                 alert("Failed to upload PDF. Please try again.");
             }
         }
@@ -80,8 +82,9 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Functional update: the editor keeps the callback from its first render
     const handleContentChange = (field: string, content: string): void => {
-        setFormData({ ...formData, [field]: content });
+        setFormData((prev) => ({ ...prev, [field]: content }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -146,7 +149,7 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                 window.location.reload();
             } else {
                 const errorData = await response.json();
-                alert(errorData.message || 'Failed to submit story. Please try again later.');
+                alert(errorData.error || 'Failed to submit story. Please try again later.');
             }
         } catch (error) {
             alert('Failed to submit story. Please try again later.');
@@ -162,12 +165,14 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                 caption: currentStory.caption,
                 author: currentStory.author,
                 type: currentStory.type,
-                date: currentStory.date,
-                image: null,
+                // <input type="date"> only accepts YYYY-MM-DD
+                date: currentStory.date ? currentStory.date.slice(0, 10) : "",
+                // Keep the existing uploads so saving without re-uploading doesn't drop them
+                image: currentStory.image ?? null,
                 kinyarwandaContent: currentStory.kinyarwandaContent,
                 englishContent: currentStory.englishContent,
                 frenchContent: currentStory.frenchContent,
-                file: null,
+                file: currentStory.file ?? null,
             });
         }
     }, [currentStory]);
@@ -213,7 +218,7 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                     accept="image/*"
                     onChange={handleImageChange}
                     className="w-full p-2 border rounded"
-                    required={formData.type === "Written Story"}
+                    required={formData.type === "Written Story" && !formData.image}
                 />
                 {typeof formData.image === "string" && formData.image && (
                     <div className="mt-2 text-green-600 text-sm">Image uploaded: <a href={formData.image} target="_blank" rel="noopener noreferrer" className="underline">View Image</a></div>
@@ -229,7 +234,7 @@ function WriteStoryForm({ currentStory }: { currentStory: Stories | null }) {
                         accept="application/pdf"
                         onChange={handleFileChange}
                         className="w-full p-2 border rounded"
-                        required={formData.type === "Illustrated"}
+                        required={formData.type === "Illustrated" && !formData.file}
                     />
                     {typeof formData.file === "string" && formData.file && (
                         <div className="mt-2 text-green-600 text-sm">PDF uploaded: <a href={formData.file} target="_blank" rel="noopener noreferrer" className="underline">View PDF</a></div>

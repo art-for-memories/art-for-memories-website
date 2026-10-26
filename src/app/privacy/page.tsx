@@ -7,7 +7,7 @@ function PrivacyPolicy() {
         <Layout>
             <PageHeader
                 title='Privacy Policy'
-                description='This Privacy Policy describes how Art of Memories (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) collects, uses, and protects your information when you use our website and services.'
+                description='This Privacy Policy describes how Art for Memories (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) collects, uses, and protects your information when you use our website and services.'
                 sup_title='Last updated: May 21, 2025'
             />
             <div className="bg-white">

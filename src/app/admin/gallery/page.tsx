@@ -29,9 +29,10 @@ function Stories() {
                 console.error('Failed to fetch images');
             }
 
-            setLoading(false);
         } catch (error) {
             console.error('Error fetching images:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -40,11 +41,7 @@ function Stories() {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`/api/gallery/${id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ slug: id }),
-            });
+            const response = await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
 
             if (response.ok) {
                 setImages(images.filter((image: { id: string }) => image.id !== id));
@@ -84,7 +81,7 @@ function Stories() {
                             <h1 className="text-xl font-semibold text-black">Gallery</h1>
 
                             <div className='flex items-center'>
-                                <button onClick={() => setFormOpen(true)} className="bg-black text-white px-4 py-2 flex items-center rounded cursor-pointer">
+                                <button onClick={() => { setCurrentImage(null); setFormOpen(true); }} className="bg-black text-white px-4 py-2 flex items-center rounded cursor-pointer">
                                     <span>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -96,7 +93,7 @@ function Stories() {
                         </div>
 
                         <FormModal isOpen={isFormOpen} onClose={() => setFormOpen(false)}>
-                            <GalleryForm onSuccess={() => {
+                            <GalleryForm key={currentImage?.id ?? 'new'} onSuccess={() => {
                                 setFormOpen(false)
                                 getAllImages();
                             }} currentImage={currentImage} />

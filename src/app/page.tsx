@@ -6,11 +6,11 @@ import Blogs from "@/components/sections/blogs";
 import TwoColumnCarousel from "@/components/TwoColumnCarousel";
 
 export const metadata: Metadata = {
-  title: "Art of Memories Rwanda",
+  title: "Art for Memories Rwanda",
   description:
-    "Art of Memories Rwanda is an initiative led by King Ngabo, launched in 2023 to preserve the legacy of Genocide Survivors by restoring old photos into vivid portraits. We transform memories into meaningful art to honor those lost in the 1994 Genocide against the Tutsi.",
+    "Art for Memories Rwanda is an initiative led by King Ngabo, launched in 2023 to preserve the legacy of Genocide Survivors by restoring old photos into vivid portraits. We transform memories into meaningful art to honor those lost in the 1994 Genocide against the Tutsi.",
   keywords: [
-    "Art of Memories Rwanda",
+    "Art for Memories Rwanda",
     "Genocide memorial",
     "King Ngabo",
     "Ingabo Corner",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   robots: "index, follow",
   metadataBase: new URL("https://artformemories.com"),
   openGraph: {
-    title: "Art of Memories Rwanda",
+    title: "Art for Memories Rwanda",
     description:
       "A creative initiative turning damaged memories into portraits to honor victims of the 1994 Genocide against the Tutsi. Led by King Ngabo and fellow Rwandan artists.",
     url: "https://artformemories.com",
@@ -40,14 +40,14 @@ export const metadata: Metadata = {
         url: "/images/thumbs.png",
         width: 1200,
         height: 630,
-        alt: "Art of Memories Rwanda banner image",
+        alt: "Art for Memories Rwanda banner image",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@artofmemoriesrw",
-    title: "Art of Memories Rwanda",
+    title: "Art for Memories Rwanda",
     description:
       "Honoring the 1994 Genocide victims through art. Discover powerful stories, restored photos, and portraits from Rwandan artists.",
     images: ["/images/thumbs.png"],

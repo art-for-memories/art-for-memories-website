@@ -1,9 +1,12 @@
 import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
-const prisma = new PrismaClient().$extends(withAccelerate())
+const createPrismaClient = () => new PrismaClient().$extends(withAccelerate())
 
-const globalForPrisma = global as unknown as { prisma: typeof prisma }
+const globalForPrisma = global as unknown as { prisma?: ReturnType<typeof createPrismaClient> }
+
+// Reuse one client across hot reloads in development instead of opening a new one each time
+const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 

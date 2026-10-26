@@ -5,8 +5,8 @@ import Stories from "./Stories";
 
 export const metadata: Metadata = {
     title: "Their Stories",
-    description: "Browse through a collection of stories that preserve the memories and legacy of Genocide Survivors through Art of Memories Rwanda.",
-    keywords: ["Stories", "Art of Memories Rwanda", "Genocide Survivors", "Preserve Memories", "Rwanda", "Art", "Genocide", "Survivors"],
+    description: "Browse through a collection of stories that preserve the memories and legacy of Genocide Survivors through Art for Memories Rwanda.",
+    keywords: ["Stories", "Art for Memories Rwanda", "Genocide Survivors", "Preserve Memories", "Rwanda", "Art", "Genocide", "Survivors"],
 };
 
 export default function Page() {

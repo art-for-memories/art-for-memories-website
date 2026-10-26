@@ -13,7 +13,7 @@ function Navbar() {
                 <div className="flex items-center space-x-2">
                     <div className="text-2xl font-bold flex items-center">
                         <Link href='/' className="bg-white text-white px-1 py-1 rounded cursor-pointer">
-                            <div><Image src={'/images/ART.PNG'} alt={"logo"} width={80} height={30} /></div>
+                            <div><Image src={'/images/ART.png'} alt={"logo"} width={80} height={30} /></div>
                         </Link>
                     </div>
                 </div>

@@ -6,8 +6,8 @@ import VideoList from "./VideoList";
 
 export const metadata: Metadata = {
     title: "One Day in 100 Days",
-    description: "Explore the stories and memories captured during the 100 days of remembrance through Art of Memories Rwanda.",
-    keywords: ["100 Days of Remembrance", "Art of Memories Rwanda", "Genocide Stories", "Preserve Memories", "Rwanda", "Art", "Genocide", "Survivors"],
+    description: "Explore the stories and memories captured during the 100 days of remembrance through Art for Memories Rwanda.",
+    keywords: ["100 Days of Remembrance", "Art for Memories Rwanda", "Genocide Stories", "Preserve Memories", "Rwanda", "Art", "Genocide", "Survivors"],
 };
 
 export default function Days() {

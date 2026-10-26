@@ -20,11 +20,7 @@ function Videos() {
             return;
         }
 
-        const response = await fetch(`/api/videos/${id}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slug: id }),
-        });
+        const response = await fetch(`/api/videos/${id}`, { method: 'DELETE' });
 
         if (response.ok) {
             setVideos((prevVideos) => prevVideos.filter((video: Video) => video.id !== id));
@@ -34,11 +30,7 @@ function Videos() {
     }
 
     const handlePreview = (id: string) => async () => {
-        const response = await fetch(`/api/videos/${id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slug: id }),
-        });
+        const response = await fetch(`/api/videos/${id}`);
 
         if (response.ok) {
             const data = await response.json();
@@ -52,11 +44,19 @@ function Videos() {
     const getVideos = async () => {
         setLoading(true);
 
-        const response = await fetch('/api/videos');
-        const data = await response.json();
+        try {
+            const response = await fetch('/api/videos');
 
-        setVideos(data);
-        setLoading(false);
+            if (response.ok) {
+                setVideos(await response.json());
+            } else {
+                console.error('Failed to fetch videos');
+            }
+        } catch (error) {
+            console.error('Error fetching videos:', error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -77,7 +77,7 @@ function Videos() {
                         <div className="flex justify-between items-center">
                             <h1 className="text-xl font-semibold text-black">Upload Videos</h1>
 
-                            <button onClick={() => setFormOpen(true)} className="bg-black text-white px-4 py-2 flex items-center rounded cursor-pointer">
+                            <button onClick={() => { setCurrentVideo(undefined); setFormOpen(true); }} className="bg-black text-white px-4 py-2 flex items-center rounded cursor-pointer">
                                 <span>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -88,7 +88,7 @@ function Videos() {
                         </div>
 
                         <FormModal isOpen={isFormOpen} onClose={() => setFormOpen(false)}>
-                            <VideoForm onCallback={() => {
+                            <VideoForm key={currentVideo?.id ?? 'new'} onCallback={() => {
                                 window.location.reload();
                             }} setFormOpen={(value) => setFormOpen(value)} currentVideo={currentVideo} />
                         </FormModal>

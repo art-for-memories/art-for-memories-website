@@ -1,12 +1,13 @@
 import Layout from '@/components/Layout'
 import Navbar from '@/components/Navbar'
+import ContactForm from '@/components/forms/ContactForm'
 import React from 'react'
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: "Get in touch with Art of Memories Rwanda for inquiries, collaborations, or support. We are here to help you preserve memories through art.",
-  keywords: ["Contact Art of Memories", "Inquiries", "Support", "Art of Memories Rwanda", "art", "memories", "rwanda", "genocide", "survivors"],
+  description: "Get in touch with Art for Memories Rwanda for inquiries, collaborations, or support. We are here to help you preserve memories through art.",
+  keywords: ["Contact Art for Memories", "Inquiries", "Support", "Art for Memories Rwanda", "art", "memories", "rwanda", "genocide", "survivors"],
 };
 
 function ContactUs() {
@@ -70,60 +71,7 @@ function ContactUs() {
                                         <h4 className="mb-2 text-5xl font-medium tracking-tight font-heading text-slate-900">Send a message</h4>
                                         <p className="text-lg text-neutral-600 font-medium tracking-tight">Do you have a question? Use the form to send a direct message.</p>
                                     </div>
-                                    <form className="max-w-2xl mx-auto" action="#">
-                                        <div className="mb-4 border-t border-neutral-100">
-                                            <div className="flex flex-wrap">
-                                                <div className="w-full md:w-4/12">
-                                                    <div className="pt-4 md:pb-4 pr-20 border-r border-neutral-100">
-                                                        <p className="text-xl font-medium tracking-tight text-slate-900">Full name</p>
-                                                    </div>
-                                                </div>
-                                                <div className="w-full md:flex-1">
-                                                    <div className="py-4 md:pl-8">
-                                                        <input className="block w-full text-xl text-neutral-400 font-medium placeholder-neutral-600 outline-none" type="text" name="name" placeholder="Full name" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="mb-4 border-t border-neutral-100">
-                                            <div className="flex flex-wrap">
-                                                <div className="w-full md:w-4/12">
-                                                    <div className="pt-4 md:pb-4 pr-20 border-r border-neutral-100">
-                                                        <p className="text-xl font-medium tracking-tight text-slate-900">Email</p>
-                                                    </div>
-                                                </div>
-                                                <div className="w-full md:flex-1">
-                                                    <div className="py-4 md:pl-8">
-                                                        <input className="block w-full text-xl text-neutral-400 font-medium placeholder-neutral-600 outline-none" type="text" name="email" placeholder="Email" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="mb-12 border-t border-neutral-100">
-                                            <div className="flex flex-wrap">
-                                                <div className="w-full md:w-4/12">
-                                                    <div className="pt-4 md:pb-16 pr-20 border-r border-neutral-100">
-                                                        <p className="text-xl font-medium tracking-tight text-slate-900">Message</p>
-                                                    </div>
-                                                </div>
-                                                <div className="w-full md:flex-1">
-                                                    <div className="pt-4 md:pl-8">
-                                                        <textarea className="block w-full text-xl text-neutral-400 font-medium placeholder-neutral-600 outline-none" name="name" rows={4} placeholder="Message"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <label className="relative flex flex-wrap items-center gap-4 mb-12">
-                                            <input className="input-checkbox-contact-1-02 opacity-0 absolute h-8 w-8 rounded-full" type="checkbox" name="field-checkbox" value="checkbox-value" />
-                                            <div className="border border-neutral-600 w-8 h-8 flex justify-center items-center rounded-full">
-                                                <svg className="fill-current hidden" xmlns="http://www.w3.org/2000/svg" width="15" height="11" viewBox="0 0 15 11" fill="none">
-                                                    <line x1="0.353553" y1="5.64645" x2="4.35355" y2="9.64645" stroke="currentColor"></line>
-                                                    <line x1="14.3536" y1="0.353553" x2="4.35355" y2="10.3536" stroke="currentColor"></line>
-                                                </svg>
-                                            </div><span className="text-neutral-500 text-lg font-medium tracking-tight">I accept the terms and privacy policy.</span>
-                                        </label>
-                                        <button className="inline-flex justify-center items-center text-center h-16 p-5 font-semibold tracking-tight text-lg text-white bg-neutral-900 hover:bg-neutral-800 focus:bg-neutral-800 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" type="submit">Send a message</button>
-                                    </form>
+                                    <ContactForm />
                                 </div>
                             </div>
                             

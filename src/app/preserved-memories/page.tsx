@@ -24,12 +24,12 @@ export default function Stories() {
 
             if (response.ok) {
                 const formattedData = data.map((art: Art) => ({
+                    id: art.id,
                     oldPhoto: art.oldPhoto,
                     preservedPhoto: art.preservedPhoto,
                     name: art.name,
                     age: art.age,
                     preview: true,
-                    killedOn: "April 08th, 1994",
                 }));
 
                 setArts(formattedData);
@@ -38,8 +38,9 @@ export default function Stories() {
                 throw new Error('Failed to fetch arts');
             }
 
-            setLoading(false);
-        } catch {
+        } catch (error) {
+            console.error('Error fetching arts:', error);
+        } finally {
             setLoading(false);
         }
     };

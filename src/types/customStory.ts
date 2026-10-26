@@ -13,4 +13,7 @@ export interface CustomStory {
   kinyarwandaContent: string;
   englishContent: string;
   frenchContent: string;
+  status?: 'pending' | 'approved' | 'rejected';
+  publishedStoryId?: string | null;
+  createdAt?: string;
 }

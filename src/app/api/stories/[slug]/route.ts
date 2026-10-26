@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
+import { requireAdmin } from "@/config/auth";
+import { normalizeStoryType } from "@/utils/storyTypes";
+import { sanitizeStoryHtml } from "@/utils/sanitize";
 
-export async function POST(req: NextRequest) {
-  const { slug } = await req.json();
+type Params = { params: Promise<{ slug: string }> };
+
+export async function GET(_req: NextRequest, { params }: Params) {
+  const { slug } = await params;
 
   try {
     const story = await prisma.story.findUnique({
@@ -28,17 +33,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Story not found" }, { status: 404 });
     }
 
-    return NextResponse.json(story);
-  } catch {
+    return NextResponse.json({
+      ...story,
+      type: normalizeStoryType(story.type),
+      kinyarwandaContent: sanitizeStoryHtml(story.kinyarwandaContent),
+      englishContent: sanitizeStoryHtml(story.englishContent),
+      frenchContent: sanitizeStoryHtml(story.frenchContent),
+    });
+  } catch (error) {
+    console.error("Error fetching story:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to fetch story" },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE(req: NextRequest) {
-  const { slug } = await req.json();
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const { slug } = await params;
 
   try {
     const deletedStory = await prisma.story.delete({

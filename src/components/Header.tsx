@@ -26,7 +26,7 @@ const Header = () => {
                     <div className="flex items-center">
                         <div className="text-2xl font-bold flex items-center">
                             <span className="bg-transparent text-white rounded">
-                                <Image src={'/images/ART.PNG'} alt={"logo"} width={90} height={50} />
+                                <Image src={'/images/ART.png'} alt={"logo"} width={90} height={50} />
                             </span>
                             {/* <span className="text-black ml-2 text-[12px] font-bold font-boldonse">Art for Memories.</span> */}
                         </div>

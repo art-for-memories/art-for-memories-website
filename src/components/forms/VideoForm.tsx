@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Video } from '@/types/video';
 import React, { useEffect, useState } from 'react'
 
 function VideoForm({ onCallback, setFormOpen, currentVideo }: { onCallback: () => void, setFormOpen: React.Dispatch<React.SetStateAction<boolean>>, currentVideo?: Video }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isPending, startTransition] = useState(false);
     const [title, setTitle] = useState('');
     const [caption, setCaption] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -39,10 +37,10 @@ function VideoForm({ onCallback, setFormOpen, currentVideo }: { onCallback: () =
             } else {
                 console.error('Failed to submit video');
             }
-
-            setIsSubmitting(false);
         } catch (error) {
             console.error('Error submitting video:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -131,7 +129,7 @@ function VideoForm({ onCallback, setFormOpen, currentVideo }: { onCallback: () =
             <div className='flex items-center justify-between mt-5'>
                 <button
                     type='submit'
-                    disabled={isSubmitting || isPending}
+                    disabled={isSubmitting}
                     className="w-auto bg-black text-white flex items-center justify-between py-3 px-4 rounded-[8px] hover:opacity-80"
                 >
                     {isSubmitting ? (

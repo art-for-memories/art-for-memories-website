@@ -20,10 +20,18 @@ export default function Memories() {
 
     const getMemories = async () => {
         setLoading(true);
-        const res = await fetch('/api/memories');
-        const data = await res.json();
-        setLoading(false);
-        setMemories(data);
+        try {
+            const res = await fetch('/api/memories');
+            if (res.ok) {
+                setMemories(await res.json());
+            } else {
+                console.error('Failed to fetch memories');
+            }
+        } catch (error) {
+            console.error('Error fetching memories:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleDelete = async (id: string) => {
@@ -32,14 +40,19 @@ export default function Memories() {
         if (confirmDelete) {
             setLoading(true);
 
-            await fetch(`/api/memories`, {
+            const response = await fetch(`/api/memories`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),
             });
 
             setLoading(false);
-            setMemories(memories.filter((memory) => memory.id !== id));
+
+            if (response.ok) {
+                setMemories(memories.filter((memory) => memory.id !== id));
+            } else {
+                console.error('Failed to delete memory');
+            }
         }
     };
 
@@ -53,7 +66,7 @@ export default function Memories() {
             setLoading(true);
 
             const data = memories.filter((memory) => {
-                return memory.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || memory.lastName.toLowerCase().includes(searchTerm.toLowerCase()) || memory.email.toLowerCase().includes(searchTerm.toLowerCase()) || memory.phone.toLowerCase().includes(searchTerm.toLowerCase()) || memory.memory.toLowerCase().includes(searchTerm.toLowerCase());
+                return memory.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || memory.lastName.toLowerCase().includes(searchTerm.toLowerCase()) || memory.email.toLowerCase().includes(searchTerm.toLowerCase()) || memory.phone.toLowerCase().includes(searchTerm.toLowerCase()) || (memory.memory || '').toLowerCase().includes(searchTerm.toLowerCase()) || (memory.victimFullName || '').toLowerCase().includes(searchTerm.toLowerCase());
             });
 
             setLoading(false);
@@ -63,14 +76,18 @@ export default function Memories() {
         }
     }
 
-    const approvedMemory = async (id: string) => {
+    const updateMemoryStatus = async (id: string, status: 'approved' | 'rejected') => {
         setLoading(true);
 
-        await fetch(`/api/memories`, {
+        const response = await fetch(`/api/memories`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, status: 'approved' }),
+            body: JSON.stringify({ id, status }),
         });
+
+        if (!response.ok) {
+            console.error(`Failed to mark memory as ${status}`);
+        }
 
         setLoading(false);
         getMemories();
@@ -98,12 +115,12 @@ export default function Memories() {
                     {/* Table */}
                     <div className="mt-4">
                         {loading && <div className="my-10"><FetchSpinner /></div>}
-                        <Table headers={headers} data={memories} onDelete={handleDelete} onPreview={previewMemory} onApproved={approvedMemory} />
+                        <Table headers={headers} data={memories} onDelete={handleDelete} onPreview={previewMemory} onApproved={(id) => updateMemoryStatus(id, 'approved')} onRejected={(id) => updateMemoryStatus(id, 'rejected')} />
                     </div>
                 </div>
 
                 <FormModal isOpen={isFormOpen} onClose={() => setFormOpen(false)}>
-                    <MemoryForm currentMemory={currentMemory} />
+                    <MemoryForm key={currentMemory?.id ?? 'new'} currentMemory={currentMemory} />
                 </FormModal>
             </div>
         </div>

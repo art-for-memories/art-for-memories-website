@@ -19,7 +19,8 @@ export interface Memory {
 export interface TableProps {
   headers: string[];
   data: Memory[];
-  onDelete: (email: string) => void;
+  onDelete: (id: string) => void;
   onPreview?: (memory: Memory) => void;
   onApproved?: (id: string) => void;
+  onRejected?: (id: string) => void;
 }

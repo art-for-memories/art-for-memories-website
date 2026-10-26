@@ -129,6 +129,10 @@ model CustomStories {
   kinyarwandaContent String
   englishContent     String
   frenchContent      String
+  // pending | approved | rejected (null on documents created before moderation existed = pending)
+  status             String?  @default("pending")
+  // Set once an approved submission has been published as a Story
+  publishedStoryId   String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
@@ -158,6 +162,14 @@ model Gallery {
   image     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid()) @map("_id")
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
 }
 
 enum Role {

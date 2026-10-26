@@ -12,7 +12,9 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [currentStory, setCurrentStory] = useState<CustomStory | null>(null);
 
-  const headers = ['title', 'author', 'date', 'type', 'firstName', 'lastName', 'email'];
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const headers = ['title', 'author', 'date', 'type', 'firstName', 'lastName', 'email', 'status'];
 
   const getAllStories = async () => {
     try {
@@ -26,10 +28,10 @@ function Page() {
       } else {
         console.error('Failed to fetch stories');
       }
-
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching stories:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,39 +42,23 @@ function Page() {
     try {
       setLoading(true);
 
-      const response = await fetch(`/api/custom-stories/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ slug: id }),
-      });
+      const response = await fetch(`/api/custom-stories/${id}`, { method: 'DELETE' });
 
       if (response.ok) {
         setStories(stories.filter((story) => story.id !== id));
-        setLoading(false);
       } else {
         console.error('Failed to delete story');
       }
-
-      setLoading(false);
     } catch (error) {
       console.error('Error deleting story:', error);
+    } finally {
       setLoading(false);
     }
   };
 
   const handlePreview = async (id: string) => {
     try {
-      const response = await fetch(`/api/custom-stories/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ slug: id }),
-      });
+      const response = await fetch(`/api/custom-stories/${id}`);
 
       if (response.ok) {
         const story = await response.json();
@@ -84,6 +70,56 @@ function Page() {
       console.error('Error fetching story details:', error);
     }
   }
+
+  const handleReject = async (id: string) => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`/api/custom-stories/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'rejected' }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to reject story');
+      }
+
+      await getAllStories();
+    } catch (error) {
+      console.error('Error rejecting story:', error);
+      setLoading(false);
+    }
+  }
+
+  // Approving copies the submission into the public stories list
+  const handlePublish = async (id: string) => {
+    const confirmPublish = window.confirm('Approve this story and publish it on the website?');
+    if (!confirmPublish) return;
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(`/api/custom-stories/${id}/publish`, { method: 'POST' });
+
+      if (!response.ok) {
+        const { error } = await response.json();
+        alert(error || 'Failed to publish story');
+      }
+
+      await getAllStories();
+    } catch (error) {
+      console.error('Error publishing story:', error);
+      setLoading(false);
+    }
+  }
+
+  const visibleStories = stories.filter((story) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return [story.title, story.author, story.firstName, story.lastName, story.email]
+      .some((value) => (value || '').toLowerCase().includes(term));
+  });
 
   useEffect(() => {
     getAllStories();
@@ -111,7 +147,7 @@ function Page() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
             </span>
-            <input type="text" placeholder="Enter Story name..." className="p-2 focus:outline-none text-slate-700" />
+            <input type="text" placeholder="Search by title, author or submitter..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 focus:outline-none text-slate-700 w-full" />
           </div>
 
           {/* Table */}
@@ -131,7 +167,7 @@ function Page() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stories.length === 0 && (
+                  {visibleStories.length === 0 && (
                     <tr>
                       <td colSpan={headers.length + 2} className="text-center">
                         <div className='bg-white rounded-xl flex flex-col items-center justify-center p-4'>
@@ -141,7 +177,7 @@ function Page() {
                       </td>
                     </tr>
                   )}
-                  {stories.map((story) => (
+                  {visibleStories.map((story) => (
                     <tr key={story.id} className="focus:outline-none h-16 border border-gray-100 rounded-lg bg-white text-black text-sm">
                       <td className={`p-4`}>
                         {story.title}
@@ -154,7 +190,26 @@ function Page() {
                       <td className="p-4">{story.firstName}</td>
                       <td className="p-4">{story.lastName}</td>
                       <td className="p-4">{story.email}</td>
+                      <td className="p-4 text-sm">
+                        {story.status === 'approved' ? (
+                          <span className="text-white bg-green-500 rounded-lg px-4 py-2">{story.publishedStoryId ? 'Published' : 'Approved'}</span>
+                        ) : story.status === 'rejected' ? (
+                          <span className="bg-red-700 rounded-lg px-4 py-2 text-white">Rejected</span>
+                        ) : (
+                          <span className="bg-yellow-700 rounded-lg px-4 py-2 text-white">Pending</span>
+                        )}
+                      </td>
                       <td className="p-4">
+                        {!story.publishedStoryId && (
+                          <button onClick={() => story.id && handlePublish(story.id)} title="Approve & publish" className="text-gray-700 hover:text-green-700 bg-green-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                            Publish
+                          </button>
+                        )}
+                        {!story.publishedStoryId && story.status !== 'rejected' && (
+                          <button onClick={() => story.id && handleReject(story.id)} title="Reject" className="text-gray-700 ml-2 hover:text-red-700 bg-yellow-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                            Reject
+                          </button>
+                        )}
                         <button onClick={() => story.id && handlePreview(story.id)} className="text-gray-500 ml-2 hover:text-red-500 bg-gray-200 rounded-xl p-2">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
